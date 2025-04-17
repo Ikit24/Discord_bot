@@ -4,16 +4,16 @@ import crescent, hikari
 
 bot = hikari.GatewayBot(os.environ["TOKEN"], intents=hikari.Intents.MESSAGE_CONTENT)
 client = crescent.Client(bot)
-client.plugins.load_folder("botty.plugins")
+client.plugins.load_folder("Botty.plugins")
 
 @client.include
 @crescent.command(description="Pong!")
 async def ping(ctx:crescent.Context) -> None:
-    await ctx.respond("Pont!")
+    await ctx.respond("Pong!")
 
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     if os.name != "nt":
         import asyncio
 
