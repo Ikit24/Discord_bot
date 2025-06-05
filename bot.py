@@ -32,5 +32,22 @@ async def start(ctx):
     human_readable_time = ctx.message.created_at.strftime("%H:%M:%S")
     await ctx.send(f"New session started at {human_readable_time}")
 
+@bot.command()
+async def end(ctx):
+    if not session.is_active:
+        await ctx.send("No session is active!")
+        return
+
+    session.is_active = False
+    end_time = ctx.message.created_at.timestamp()
+    duration_seconds = end_time - session.start_time
+    
+    hours = int(duration_seconds // 3600)
+    minutes = int((duration_seconds % 3600) //60)
+    seconds = int(duration_seconds % 60)
+    formatted_duration = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+    await ctx.send(f"Session ended after {formatted_duration} seconds.")
+
 
 bot.run(BOT_TOKEN)
