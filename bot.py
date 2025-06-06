@@ -1,4 +1,4 @@
-from discord.ext import commands
+from discord.ext import commands, tasks
 import discord
 from dataclasses import dataclass
 
@@ -6,6 +6,7 @@ with open('token.txt', 'r') as f:
     BOT_TOKEN = f.read().strip()
 
 CHANNEL_ID = 308289885767204864
+MAX_SESSION_TIME_MINUTES = 30
 
 @dataclass
 class Session:
@@ -21,6 +22,14 @@ async def on_ready():
     channel = bot.get_channel(CHANNEL_ID)
     await channel.send("Hello! Study bot is ready!")
 
+@tasks.loop(minutes=MAX_SESSION_TIME_MINUTES, count=2)
+async def break_reminder():
+    if break_reminder.current_loop ==0:
+        return
+
+    channel = bot.get_channel(CHANNEL_ID)
+    await channel.send(f"**Take a break!** You've been studying for {MAX_SESSION_TIME_MINUTES} minutes.")
+
 @bot.command()
 async def start(ctx):
     if session.is_active:
@@ -30,6 +39,7 @@ async def start(ctx):
     session.is_active = True
     session.start_time = ctx.message.created_at.timestamp()
     human_readable_time = ctx.message.created_at.strftime("%H:%M:%S")
+    break_reminder.start()
     await ctx.send(f"New session started at {human_readable_time}")
 
 @bot.command()
@@ -47,7 +57,8 @@ async def end(ctx):
     seconds = int(duration_seconds % 60)
     formatted_duration = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
-    await ctx.send(f"Session ended after {formatted_duration} seconds.")
+    break_reminder.stop()
+    await ctx.send(f"Session ended after {formatted_duration}.")
 
 
 bot.run(BOT_TOKEN)
