@@ -9,13 +9,15 @@ CHANNEL_ID = 308289885767204864
 MAX_SESSION_TIME_MINUTES = 30
 
 greetings = [
-    "Hey there! How’s it going?",
+    "Hey there!👋 How’s it going?",
     "Hi! Great to see you!",
     "Hello! Hope you’re having a good day.",
     "Hey! What’s new with you?",
     "Hi there! Long time no see.",
     "Good to see you! How have you been?",
     "Hey! How are things?",
+    "Howdy! 🤠",
+    "Sup! 😎",
     "Hello! Everything okay on your end?",
     "Hi! What’s been keeping you busy?",
     "Hey, hey! How’s life treating you?",
@@ -59,7 +61,7 @@ async def break_reminder():
 async def greeting(ctx):
     random_greeting = random.choice(greetings)
 
-    await ctx.send(random_greeting)
+    await ctx.send(random.choice(greetings))
 
 
 @bot.command()
