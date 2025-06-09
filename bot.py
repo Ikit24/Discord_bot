@@ -8,30 +8,14 @@ with open('token.txt', 'r') as f:
 CHANNEL_ID = 308289885767204864
 MAX_SESSION_TIME_MINUTES = 30
 
-greetings = [
-    "Hey there!👋 How’s it going?",
-    "Hi! Great to see you!",
-    "Hello! Hope you’re having a good day.",
-    "Hey! What’s new with you?",
-    "Hi there! Long time no see.",
-    "Good to see you! How have you been?",
-    "Hey! How are things?",
-    "Howdy! 🤠",
-    "Sup! 😎",
-    "Hello! Everything okay on your end?",
-    "Hi! What’s been keeping you busy?",
-    "Hey, hey! How’s life treating you?",
-    "Hi! Nice to hear from you.",
-    "Hello there! What’s going on?",
-    "Hey! How’s your day shaping up?",
-    "Hiya! All good with you?",
-    "Yo! What’s happening?",
-    "Hey! Feeling good today?",
-    "Hi! Got time for a quick chat?",
-    "Hello! Been thinking about you.",
-    "Hey there! What’s on your mind?",
-    "Hi! Let’s catch up soon."
-]
+greeting_responses = {
+    'hello':["Hello! 👋", "Hi there!", "Hey!", "Greetings!"],
+    'hi': ["Hello! 👋", "Hi there!", "Hey!", "Greetings!"],
+    'morning': ["Good morning! ☀️", "Morning!", "Rise and shine!", "Top of the morning!"],
+    'evening': ["Good evening! 🌙", "Evening!", "Hope you had a great day!"],
+    'sup': ["Sup! 😎", "Yo!", "What's good?", "Ayy!"],
+    'bye': ["See ya! 👋", "Goodbye!", "Take care!", "Catch you later!"]
+}
 
 @dataclass
 class Session:
@@ -41,12 +25,41 @@ class Session:
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 session = Session()
 
-
 @bot.event
 async def on_ready():
     print("Hello! Study bot is ready!")
     channel = bot.get_channel(CHANNEL_ID)
-    await channel.send("Hello! Study bot is ready!")
+    if channel:
+        try:
+            await channel.send("Hello! Study bot is ready!")
+        except discord.errors.Forbidden:
+            print("Bot doesn't have permission to send to this channel")
+    else:
+        print("Channel not found")
+
+@bot.command(name='hello')
+async def hello(ctx):
+    await ctx.send(random.choice(greeting_responses['hello']))
+
+@bot.command(name='hi')
+async def hi(ctx):
+    await ctx.send(random.choice(greeting_responses['hi']))
+
+@bot.command(name='morning')
+async def morning(ctx):
+    await ctx.send(random.choice(greeting_responses['morning']))
+
+@bot.command(name='evening')
+async def evening(ctx):
+    await ctx.send(random.choice(greeting_responses['evening']))
+
+@bot.command(name='sup')
+async def sup(ctx):
+    await ctx.send(random.choice(greeting_responses['sup']))
+
+@bot.command(name='bye')
+async def bye(ctx):
+    await ctx.send(random.choice(greeting_responses['bye']))  
 
 
 @tasks.loop(minutes=MAX_SESSION_TIME_MINUTES, count=2)
@@ -56,12 +69,6 @@ async def break_reminder():
 
     channel = bot.get_channel(CHANNEL_ID)
     await channel.send(f"**Take a break!** You've been studying for {MAX_SESSION_TIME_MINUTES} minutes.")
-
-@bot.command(name="hello")
-async def greeting(ctx):
-    random_greeting = random.choice(greetings)
-
-    await ctx.send(random.choice(greetings))
 
 
 @bot.command()
