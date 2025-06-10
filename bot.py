@@ -102,5 +102,36 @@ async def end(ctx):
     break_reminder.stop()
     await ctx.send(f"Session ended after {formatted_duration}.")
 
+@bot.command()
+async def create_poll(ctx, *, args):
+    parts = [part.strip() for part in args.split('|')]
+
+    if len(parts) < 3:
+        await ctx.send("Format: `!create_poll Question? | Option 1| Option 2 | Option 3`")
+        return
+
+    question = parts [0]
+    options = parts[1:]
+    
+    if not question.strip():
+        await ctx.send("Question cannot be empty!")
+        return
+    
+    if len(options) > 20:
+        await ctx.send("Too many options! Max 20 reactions allowed!")
+
+    poll_text = f"**{question}**\n\n"
+
+    emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', 
+              '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹']
+
+    for i, option in enumerate(options):
+        poll_text += f"{emojis[i]} {option}\n"
+
+    poll_message = await ctx.send(poll_text)
+
+    for i in range(len(options)):
+        await poll_message.add_reaction(emojis[i])    
+
 
 bot.run(BOT_TOKEN)
