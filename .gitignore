@@ -1,3 +1,6 @@
 .env
 venv
 token.txt
+*.swp
+*.swo
+*.swn
