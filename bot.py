@@ -129,9 +129,20 @@ async def create_poll(ctx, *, args):
         poll_text += f"{emojis[i]} {option}\n"
 
     poll_message = await ctx.send(poll_text)
+    
+    active_polls[poll_message.id] = {
+        'question': question,
+        'options': options,
+        'channel': ctx.channel.id,
+        'creator': ctx.author.id
+    }    
 
     for i in range(len(options)):
         await poll_message.add_reaction(emojis[i])    
 
+@bot command()
+async def poll_results(ctx, nessage_id):
+   if mesage_id is None:
+        await ctx.send("Please provide a message ID or use Dev mode to copy from the poll message.") 
 
 bot.run(BOT_TOKEN)
