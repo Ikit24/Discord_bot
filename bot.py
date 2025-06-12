@@ -102,6 +102,7 @@ async def end(ctx):
     break_reminder.stop()
     await ctx.send(f"Session ended after {formatted_duration}.")
 
+active_polls = {}
 @bot.command()
 async def create_poll(ctx, *, args):
     parts = [part.strip() for part in args.split('|')]
@@ -140,9 +141,57 @@ async def create_poll(ctx, *, args):
     for i in range(len(options)):
         await poll_message.add_reaction(emojis[i])    
 
-@bot command()
-async def poll_results(ctx, nessage_id):
-   if mesage_id is None:
+@bot.command()
+async def poll_results(ctx, message_id):
+   if message_id is None:
         await ctx.send("Please provide a message ID or use Dev mode to copy from the poll message.") 
+        return
+
+@bot.command()
+async def list_polls(ctx):
+    if not active_polls:
+        await ctx.send("No active polls")
+        return
+
+    for message_id, poll_data in active_polls.items():
+        await ctx.send(f"Poll ID: {message_id} - Question: {poll_data['question']}")
+
+@bot.command()
+async def end_poll(ctx, message_id):
+   if message_id not in active_polls:
+       await ctx.send("Poll not found!")
+       return
+   
+   poll_data = active_polls[message_id]
+   
+   if poll_data['creator'] != ctx.author.id:
+       await ctx.send("Only the poll creator can end this poll!")
+       return
+   
+   channel = bot.get_channel(poll_data['channel'])
+   poll_message = await channel.fetch_message(message_id)
+   
+   emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯']
+   
+   results_text = f"**Poll Results: {poll_data['question']}**\n\n"
+   vote_counts = []
+   
+   for i, option in enumerate(poll_data['options']):
+       count = 0
+       for reaction in poll_message.reactions:
+           if str(reaction.emoji) == emojis[i]:
+               count = reaction.count - 1
+               break
+       results_text += f"• {option}: {count} votes\n"
+       vote_counts.append(count)
+   
+   winner_index = vote_counts.index(max(vote_counts))
+   winner_option = poll_data['options'][winner_index]
+   results_text += f"\n🏆 **Winner: {winner_option}**"
+   
+   await ctx.send(results_text)
+   
+   del active_polls[message_id] 
+
 
 bot.run(BOT_TOKEN)
