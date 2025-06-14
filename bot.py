@@ -64,7 +64,7 @@ async def bye(ctx):
 
 @tasks.loop(minutes=MAX_SESSION_TIME_MINUTES, count=2)
 async def break_reminder():
-    if break_reminder.current_loop ==0:
+    if break_reminder.current_loop == 0:
         return
 
     channel = bot.get_channel(CHANNEL_ID)
@@ -120,6 +120,7 @@ async def create_poll(ctx, *, args):
     
     if len(options) > 20:
         await ctx.send("Too many options! Max 20 reactions allowed!")
+        return
 
     poll_text = f"**{question}**\n\n"
 
@@ -142,10 +143,36 @@ async def create_poll(ctx, *, args):
         await poll_message.add_reaction(emojis[i])    
 
 @bot.command()
-async def poll_results(ctx, message_id):
-   if message_id is None:
-        await ctx.send("Please provide a message ID or use Dev mode to copy from the poll message.") 
+async def poll_results(ctx, message_id: int):
+    if message_id not in active_polls:
+        await ctx.send("Poll not found!")
         return
+    
+    poll_data = active_polls[message_id]
+    channel = bot.get_channel(poll_data['channel'])
+    poll_message = await channel.fetch_message(message_id)
+    
+    emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', 
+              '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹']
+    
+    results_text = f"**Poll Results: {poll_data['question']}**\n\n"
+    vote_counts = []
+    
+    for i, option in enumerate(poll_data['options']):
+        count = 0
+        for reaction in poll_message.reactions:
+            if str(reaction.emoji) == emojis[i]:
+                count = reaction.count - 1
+                break
+        results_text += f"• {option}: {count} votes\n"
+        vote_counts.append(count)
+    
+    if vote_counts and max(vote_counts) > 0:
+        winner_index = vote_counts.index(max(vote_counts))
+        winner_option = poll_data['options'][winner_index]
+        results_text += f"\n🏆 **Winner: {winner_option}**"
+    
+    await ctx.send(results_text)
 
 @bot.command()
 async def list_polls(ctx):
@@ -157,7 +184,7 @@ async def list_polls(ctx):
         await ctx.send(f"Poll ID: {message_id} - Question: {poll_data['question']}")
 
 @bot.command()
-async def end_poll(ctx, message_id):
+async def end_poll(ctx, message_id: int):
    if message_id not in active_polls:
        await ctx.send("Poll not found!")
        return
