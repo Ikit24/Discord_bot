@@ -112,7 +112,15 @@ async def create_poll(ctx, *, args):
         return
 
     question = parts [0]
-    options = parts[1:]
+
+    try:
+        duration = int(parts[-1])
+        options = parts[1:-1]
+        timed = True
+    except ValueError:
+        options = parts[1:]
+        duration = None
+        timed = False
     
     if not question.strip():
         await ctx.send("Question cannot be empty!")
@@ -130,17 +138,25 @@ async def create_poll(ctx, *, args):
     for i, option in enumerate(options):
         poll_text += f"{emojis[i]} {option}\n"
 
+    if timed:
+        poll_text += f"\n⏰ **Poll ends in {duration} minutes**"
+
     poll_message = await ctx.send(poll_text)
+
+    for i in range(len(options)):
+        await poll_message.add_reaction(emojis[i])
     
     active_polls[poll_message.id] = {
         'question': question,
         'options': options,
         'channel': ctx.channel.id,
-        'creator': ctx.author.id
+        'creator': ctx.author.id,
+        'timed': timed,
+        'duration': duration
     }    
-
-    for i in range(len(options)):
-        await poll_message.add_reaction(emojis[i])    
+    
+    if timed:
+        asyncio.create_task(auto_end_poll(poll_message.id, duration * 60))
 
 @bot.command()
 async def poll_results(ctx, message_id: int):
