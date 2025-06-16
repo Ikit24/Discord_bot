@@ -102,6 +102,37 @@ async def end(ctx):
     break_reminder.stop()
     await ctx.send(f"Session ended after {formatted_duration}.")
 
+async def auto_end_poll(message_id, duration_seconds):
+    await asyncio.sleep(duration_seconds)
+
+    if message_id not in active_polls:
+        return
+
+    poll_data = active_polls[message_id]
+    channel = bot.get_channel(poll_data['channel'])
+    poll_message = await channel.fetch_message(message_id)
+
+    emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯']
+
+    results_text = f"**⏰ POLL ENDED: {poll_data['question']}**\n\n"
+    vote_counts = []
+
+    for i, option in enumerate(poll_data['options']):
+        count = 0
+        for reaction in poll_message.reactions:
+            if str(reaction_emoji) == emojis[i]:
+                count = reaction.count - 1
+                break
+        results_text += f"• {option}: {count} votes\n"
+        vote_counts.append(count)
+
+    winner_index = vote_counts.index(max(vote_counts))
+    winner_option = poll_data['options'][winner_index]
+    results_text += f"\n🏆 **Winner: {winner_option}**"
+
+    await channel.send(results_text)
+    del active_polls[message_id]
+
 active_polls = {}
 @bot.command()
 async def create_poll(ctx, *, args):
@@ -235,6 +266,5 @@ async def end_poll(ctx, message_id: int):
    await ctx.send(results_text)
    
    del active_polls[message_id] 
-
 
 bot.run(BOT_TOKEN)
