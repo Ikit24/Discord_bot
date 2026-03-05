@@ -1,27 +1,27 @@
-# 📚 Discord Study Bot
+# Discord Study Bot
 
 A feature-rich Discord bot designed to help students manage study sessions and create interactive polls. Perfect for study groups, educational servers, and productivity tracking!
 
-## ✨ Features
+## Features
 
-### 📖 Study Session Management
+### Study Session Management
 - **Start/End Sessions**: Track your study time with automatic break reminders
 - **Session Status**: Check current session progress and duration
 - **Break Reminders**: Automatic notifications after 30 minutes of studying
 - **Duration Tracking**: Detailed session summaries with motivational achievements
 
-### 📊 Interactive Polls
+### Interactive Polls
 - **Create Polls**: Easy-to-use poll creation with multiple options
 - **Real-time Results**: Check poll results anytime without ending the poll
 - **Poll Management**: List active polls and end them when ready
 - **Visual Feedback**: Emoji-based voting system with clear result display
 
-### 👋 Social Features
+### Social Features
 - **Greeting Commands**: Friendly responses to common greetings
 - **Rich Embeds**: Beautiful, colorful message formatting
 - **User Permissions**: Creator-only controls for sessions and polls
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.8 or higher
@@ -49,7 +49,7 @@ A feature-rich Discord bot designed to help students manage study sessions and c
    python your_bot_file.py
    ```
 
-## 🎮 Commands
+## Commands
 
 ### Study Session Commands
 | Command | Description | Usage |
@@ -120,7 +120,7 @@ Bot: ✅ Study Session Completed!
      Achievement: 🏆 Excellent focus! You studied for over 30 minutes!
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Customizable Settings
 - **MAX_SESSION_TIME_MINUTES**: Change break reminder interval (default: 30 minutes)
@@ -135,7 +135,7 @@ The bot needs the following Discord permissions:
 - Use External Emojis
 - Embed Links
 
-## 🔧 Technical Details
+## Technical Details
 
 ### Built With
 - **Discord.py**: Python Discord API wrapper
@@ -149,7 +149,7 @@ The bot needs the following Discord permissions:
 - **Error Handling**: Comprehensive error management
 - **Permission Checks**: Secure command access control
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
